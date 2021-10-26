@@ -1,7 +1,10 @@
 import socket
 import threading
 import os
+from des import des
 
+key = "secret_k"
+d = des()
 def read_msg(clients, sock_cli, addr_cli, username_cli):
     while True:
         # terima pesan
@@ -18,13 +21,16 @@ def read_msg(clients, sock_cli, addr_cli, username_cli):
             _, user_1, user_2 = data.decode("utf - 8").split("|")
             if user_2 in clients:
                 add_friend(user_1, user_2)
-                send_msg(sock_cli, '{} added as friend'.format(user_2))
+                msg = "[added as friend]"
             else:
-                send_msg(sock_cli, '{} not found'.format(user_2))
+                msg = "[error not found]"
+            encrypted = d.encrypt(key, msg, padding=True)
+            send_msg(sock_cli, f'{user_2}|{encrypted}')
+
 
         elif act == 'chat':
             act, sender, dest, msg = data.decode("utf - 8").split("|")
-            msg = "<{}>: {}".format(username_cli, msg)
+            msg = "<{}>|{}".format(username_cli, msg)
 
             #terusankan psan ke semua klien
             if dest =="bcast":

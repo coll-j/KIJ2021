@@ -1,9 +1,11 @@
 import socket
 import sys
 import threading
-import pickle
 import os
+from des import des
 
+key = "secret_k"
+d = des()
 def read_msg(sock_cli):
     while True:
         # terima pesan
@@ -11,12 +13,14 @@ def read_msg(sock_cli):
         if len(data) == 0:
             break
 
-        msg = data.decode('utf-8')
-        if '<' in msg:
+        decoded_data = data.decode('utf-8')
+        if '<' in decoded_data:
             clear_line()
-            print(msg)
+            username, msg = decoded_data.split("|")
+            msg = d.decrypt(key, msg, padding=True)
+            print(f"{username}: {msg}")
             print("Pilih aksi [1: kirim pesan, 2: kirim file, 3: lihat daftar pengguna, 4: tambah teman, 5: exit]:")
-        elif msg == "file":
+        elif decoded_data == "file":
             clear_line()
             data = sock_cli.recv(65535)
             msg = data.decode('utf-8')
@@ -24,7 +28,9 @@ def read_msg(sock_cli):
             client_recieve_file(sock_cli,msg)
         else:
             clear_line()
-            print(msg)
+            username, msg = decoded_data.split("|")
+            msg = d.decrypt(key, msg, padding=True)
+            print(f"{username}: {msg}")
 
 def clear_line():
     sys.stdout.write("\033[F") #back to previous line 
@@ -86,8 +92,9 @@ if __name__ == '__main__':
             dest = input("Masukkan username tujuan (ketikan bcast untuk broadcast pesan):")
             clear_line()
             msg = input("Masukkan pesan untuk {}:".format(dest))
+            encrypted = d.encrypt(key, msg, padding=True)
             clear_line()
-            data = ["chat",username, dest, msg]
+            data = ["chat",username, dest, encrypted]
 
             print("<{}>: {}".format(username, msg))
             sock_cli.send(bytes('|'.join(data), 'utf-8'))
