@@ -14,23 +14,11 @@ def read_msg(sock_cli):
             break
 
         decoded_data = data.decode('utf-8')
-        if '<' in decoded_data:
-            clear_line()
-            username, msg = decoded_data.split("|")
-            msg = d.decrypt(key, msg, padding=True)
-            print(f"{username}: {msg}")
-            print("Pilih aksi [1: kirim pesan, 2: kirim file, 3: lihat daftar pengguna, 4: tambah teman, 5: exit]:")
-        elif decoded_data == "file":
-            clear_line()
-            data = sock_cli.recv(65535)
-            msg = data.decode('utf-8')
-            print("file recieve :" + msg)
-            client_recieve_file(sock_cli,msg)
-        else:
-            clear_line()
-            username, msg = decoded_data.split("|")
-            msg = d.decrypt(key, msg, padding=True)
-            print(f"{username}: {msg}")
+        clear_line()
+        username, msg = decoded_data.split("|")
+        msg = d.decrypt(key, msg, padding=True)
+        print(f"{username}: {msg}")
+        print("Pilih aksi [1: kirim pesan, 2: tambah teman, 3: exit]:")
 
 def clear_line():
     sys.stdout.write("\033[F") #back to previous line 
@@ -84,7 +72,7 @@ if __name__ == '__main__':
     thread_cli.start()
 
     while True:
-        act = int(input("Pilih aksi [1: kirim pesan, 2: kirim file, 3: lihat daftar pengguna, 4: tambah teman, 5: exit]:\n"))
+        act = int(input("Pilih aksi [1: kirim pesan, 2: tambah teman, 3: exit]:\n"))
         clear_line()
         if act == 1:
             clear_line()
@@ -99,25 +87,6 @@ if __name__ == '__main__':
             print("<{}>: {}".format(username, msg))
             sock_cli.send(bytes('|'.join(data), 'utf-8'))
         elif act == 2:
-            clear_line()
-            # kirim/terima file
-            dest = input("Masukkan username tujuan (ketikan bcast untuk broadcast file):")
-            clear_line()
-            msg = input("Masukkan path file untuk {}:".format(dest))
-            clear_line()
-            if(os.path.isfile(msg)):
-                data = ["file",username, dest, msg]
-
-                print("<{}>: {}".format(username, msg))
-                sock_cli.send(bytes('|'.join(data), 'utf-8')) 
-                client_send_file(sock_cli,msg)
-            else:
-                print("file not found")
-        elif act == 3:
-            # lihat daftar pengguna
-            # clear_line()
-            sock_cli.send(bytes('get_user', 'utf-8'))
-        elif act == 4:
             # tambah teman
             clear_line()
             dest = input("Masukkan username yang ingin ditambahkan:")
@@ -125,8 +94,9 @@ if __name__ == '__main__':
             
             data = "add|{}|{}".format(username, dest)
             sock_cli.send(bytes(data, 'utf-8'))
-        if act == 5:
+        if act == 3:
             # sock_cli.send(bytes('exit', 'utf-8'))
             sock_cli.close()
             break
 
+    exit()
