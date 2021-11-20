@@ -3,8 +3,8 @@
 # File              : rsa.py
 # Author            : Kaushik S Kalmady
 # Date              : 12.12.2017
-# Last Modified Date: 13.12.2017
-# Last Modified By  : Kaushik S Kalmady
+# Last Modified Date: 20.11.2021
+# Last Modified By  : Jek & Rosie
 
 import random
 from struct import pack, unpack
