@@ -68,6 +68,8 @@ class RSA(object):
         if length % 4:
             extra = (4 - length % 4)
             message = as_bytes('\000') * extra + as_bytes(message)
+        else:
+            message = as_bytes(message)
 
         for i in range(0, length, 4):
             acc = (acc << 32) + unpack('>I', message[i:i+4])[0]
@@ -130,9 +132,9 @@ class RSA(object):
         """
 
         d, n = self.__private_key
-        if ciphertext.is_str:
-            return self.recover_string(exp(ciphertext.text, d, n))
-        return exp(ciphertext.text, d, n)
+        # if ciphertext.is_str:
+        return self.recover_string(exp(ciphertext, d, n))
+        # return exp(ciphertext.text, d, n)
 
     def sign(self, message):
         """RSA signing
