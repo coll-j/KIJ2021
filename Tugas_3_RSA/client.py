@@ -18,22 +18,19 @@ def read_msg(sock_cli):
         decoded_data = data.decode('utf-8')
         try:
             username, msg = decoded_data.split("|")
-            # msg = d.decrypt(key, msg, padding=True)
             try: # parse public key as tuple
                 public_key = eval(msg)
                 if type(public_key) == tuple:
                     public_keys[username] = public_key
                     print(f"{username} ditambahkan sebagai teman.")
                 else:
-                    print("decrypting")
+                    print("decrypting...")
                     msg = rsa.decrypt(int(msg))
                     print(f"  {username}: {msg.decode('utf-8')}")
-
             except:
                 pass
-            print("Pilih aksi [1: kirim pesan, 2: tambah teman, 3: exit]:")
         except:
-            print("Pilih aksi [1: kirim pesan, 2: tambah teman, 3: exit]:")
+            pass
 
 
 def client_recieve_file(client_socket,filename):
@@ -84,11 +81,11 @@ if __name__ == '__main__':
     thread_cli.start()
 
     while True:
-        act = int(input("Pilih aksi [1: kirim pesan, 2: tambah teman, 3: exit]:\n"))
+        act = int(input("Pilih aksi [1: kirim pesan, 2: tambah teman, 3: exit, 4: lihat public key]:\n"))
         if act == 1:
             # kirim/terima pesan
-            dest = input("Masukkan username tujuan:")
-            msg = input("Masukkan pesan untuk {}:".format(dest))
+            dest = input("Masukkan username tujuan: ")
+            msg = input("Masukkan pesan untuk {}: ".format(dest))
             if dest in public_keys:
                 public_key = public_keys[dest]
                 encrypted = rsa.encrypt(msg, public_key)
@@ -100,7 +97,7 @@ if __name__ == '__main__':
                 print(f"{dest} belum ditambahkan sebagai teman.")
         elif act == 2:
             # tambah teman
-            dest = input("Masukkan username yang ingin ditambahkan:")
+            dest = input("Masukkan username yang ingin ditambahkan: ")
             data = "add|{}|{}".format(username, dest)
             sock_cli.send(bytes(data, 'utf-8'))
         if act == 3:
