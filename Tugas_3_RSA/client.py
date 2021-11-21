@@ -74,7 +74,9 @@ if __name__ == '__main__':
 
     # kirim username ke server
     username = sys.argv[1]
-    sock_cli.send(bytes(f"{username}|{rsa.public_key}", "utf-8"))
+    public_key_cli = rsa.public_key
+    sock_cli.send(bytes(f"{username}|{public_key_cli}", "utf-8"))
+    public_keys[username] = public_key_cli
 
     # buat thread utk membaca pesan dan jalankan threadnya
     thread_cli = threading.Thread(target=read_msg, args=(sock_cli,))
@@ -100,7 +102,10 @@ if __name__ == '__main__':
             dest = input("Masukkan username yang ingin ditambahkan: ")
             data = "add|{}|{}".format(username, dest)
             sock_cli.send(bytes(data, 'utf-8'))
-        if act == 3:
+        elif act == 3:
             # sock_cli.send(bytes('exit', 'utf-8'))
             sock_cli.close()
             exit()
+        elif act == 4:
+            print("Public key for {} is {}".format(username, public_keys[username]))
+            continue
