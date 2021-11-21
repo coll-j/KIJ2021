@@ -33,34 +33,6 @@ def read_msg(sock_cli):
             pass
 
 
-def client_recieve_file(client_socket,filename):
-    size = client_socket.recv(65535)
-    size = size.decode('utf-8')
-    size = int(float(size))
-    size += 1
-    file = open(filename, 'wb')
-    while size> 0:
-        data = client_socket.recv(65535)
-        file.write(data)
-        size -= 1
-    file.close()
-
-def client_send_file(client_socket,filename):
-    file = open(filename)
-    file.seek(0, os.SEEK_END)
-    filesize =str(file.tell()/65535)
-    client_socket.send(bytes(filesize, "utf-8"))
-    file.close()
-
-    file = open(filename,'rb')
-
-    while True:
-        data = file.read(65535)
-        if not data:
-            file.close()
-            break
-        client_socket.send(data)
-
 if __name__ == '__main__':
     if len(sys.argv) != 2:
         print('Expected Username as command line argument')
