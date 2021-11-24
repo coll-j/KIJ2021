@@ -136,46 +136,6 @@ class RSA(object):
         return self.recover_string(exp(ciphertext, d, n))
         # return exp(ciphertext.text, d, n)
 
-    def sign(self, message):
-        """RSA signing
-        Similar to RSA encryption but we use private key to sign.
-        Note that this is merely for proof of concept and should not be used
-        in production
-        Args:
-                message: message to sign
-        REFERENCES
-        ==========
-        https://en.wikipedia.org/wiki/RSA_(cryptosystem)#Signing_messages
-        """
-        # If input is string, convert it to long first
-        self.is_str = 0
-        if type(message) is str:
-            self.is_str = 1
-            if len(message) > 32:
-                raise ValueError("Please enter a smaller string")
-            message = self.process_string(message)
-
-        assert message.bit_length() <= self.n.bit_length()
-
-        d, n = self.__private_key
-        return Ciphertext(exp(message, d, n), self.is_str)
-
-    def verify(self, signature, key):
-        """RSA signature verification
-        Args:
-            signature: signature we want to verify
-            key: public key of the person who's signature we want to verify
-        REFERENCES
-        ==========
-        https://en.wikipedia.org/wiki/RSA_(cryptosystem)#Signing_messages
-        """
-
-        e, n = key
-        if signature.is_str:
-            return self.recover_string(exp(signature.text, e, n))
-        return exp(signature.text, e, n)
-
-
 class Ciphertext():
     """Ciphertext
     Wrapper class for ciphertext"""
